@@ -9,6 +9,7 @@
 #      · Click           → alterna RES ↔ D/L con animación
 # =============================================================
 
+import time
 from config   import UMBRAL_REPOSO, VARIANZA_MAX, PIN_MODO
 from medicion import (leer_adc, auto_ranging, calcular_resistencia,
                       formatear_ohms, rango_etiqueta, leer_vf)
@@ -24,9 +25,10 @@ print("VoltFlow | BOOT: click=BLE  hold=BLE off  |  SW: modo RES/D/L")
 ble        = VoltBLE()
 btn        = Button()
 btn_modo   = Button(pin=PIN_MODO)
-ult_txt    = ""
-modo       = "RES"   # "RES" o "DIL"
-_tipo_prev = None
+ult_txt      = ""
+modo         = "RES"   # "RES" o "DIL"
+_tipo_prev   = None
+_sin_comp    = True    # True cuando no había componente en ciclo anterior
 
 set_modo("RES")
 
@@ -64,11 +66,20 @@ while True:
 
         if valor_adc > UMBRAL_REPOSO:
             mostrar_reposo(ble_state=ble.state)
+            _sin_comp = True
 
         elif varianza > VARIANZA_MAX:
             mostrar_sin_componente(rango_etiqueta(), ble_state=ble.state)
+            _sin_comp = True
 
         else:
+            if _sin_comp:
+                # Primera lectura al conectar: el cap film estaba cargado
+                # a ~VIN y aún no descargó. Esperar antes de mostrar.
+                _sin_comp = False
+                time.sleep_ms(400)
+                continue
+
             resistencia = calcular_resistencia(valor_adc)
             if resistencia is None:
                 mostrar_cortocircuito(rango_etiqueta(), ble_state=ble.state)

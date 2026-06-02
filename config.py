@@ -16,8 +16,8 @@ PIN_SDA    = 21   # I2C datos (OLED)
 # ── Calibración ───────────────────────────────────────────────
 #  Valores obtenidos con calibrar.py. Cópialos aquí después
 #  de correr ese script con tu circuito.
-R1_BAJO = 1272.0    # Ohms – resistencia interna del rango bajo
-R1_ALTO = 12192.9   # Ohms – resistencia interna del rango alto
+R1_BAJO = 1422.1    # Ohms – resistencia de 560Ω
+R1_ALTO = 269689.7   # Ohms – resistencia de 10kΩ
 VIN     = 3.2       # Voltios – tensión de referencia del ADC
 
 # ── Umbrales de auto-ranging ──────────────────────────────────
@@ -28,6 +28,12 @@ BAJAR_RANGO   = 450    # ADC < 450  en rango ALTO  → cambiar a BAJO
 SUBIR_RANGO   = 3000   # ADC > 3000 en rango BAJO  → cambiar a ALTO
 UMBRAL_REPOSO = 3900   # ADC > 3900 → sin componente conectado
 VARIANZA_MAX  = 30000  # Varianza alta → señal inestable
+
+# ── Calibración modo D/L ──────────────────────────────────────
+#  Compensa la caída del diodo 1N4007 en el camino del ADC.
+#  Mide un diodo conocido (ej. 1N4007, Vf real ≈ 0.65V a 1mA)
+#  y ajusta este valor hasta que el display coincida.
+VF_OFFSET = 0.25        # Voltios — aumenta si el valor mostrado es muy bajo
 
 # ── Buzzer y switch de modo ───────────────────────────────────
 PIN_BUZZER = 18   # Buzzer activo: GVS → S=(+), G=(-)

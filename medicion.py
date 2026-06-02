@@ -17,7 +17,8 @@ import time
 from config import (PIN_ADC, PIN_R_BAJO, PIN_R_ALTO,
                     R1_BAJO, R1_ALTO, VIN,
                     BAJAR_RANGO, SUBIR_RANGO,
-                    UMBRAL_REPOSO, VARIANZA_MAX)
+                    UMBRAL_REPOSO, VARIANZA_MAX,
+                    VF_OFFSET)
 
 # ── Configuración del ADC ─────────────────────────────────────
 adc = machine.ADC(machine.Pin(PIN_ADC))
@@ -42,7 +43,7 @@ def set_rango(nuevo):
         pin_r_alto.init(machine.Pin.OUT, value=1)
         pin_r_bajo.init(machine.Pin.IN)
     rango_actual = nuevo
-    time.sleep_ms(20)
+    time.sleep_ms(400)
 
 
 def leer_adc(n=50):
@@ -113,6 +114,6 @@ def leer_vf():
     valor_adc, varianza = leer_adc()
     if valor_adc > UMBRAL_REPOSO or varianza > VARIANZA_MAX:
         return None, None, varianza
-    vf   = (valor_adc / 4095.0) * VIN
+    vf   = (valor_adc / 4095.0) * VIN + VF_OFFSET
     tipo = 'LED' if vf >= 1.4 else 'DIODO'
     return vf, tipo, varianza
