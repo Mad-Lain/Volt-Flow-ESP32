@@ -74,10 +74,8 @@ while True:
 
         else:
             if _sin_comp:
-                # Primera lectura al conectar: el cap film estaba cargado
-                # a ~VIN y aún no descargó. Esperar antes de mostrar.
                 _sin_comp = False
-                time.sleep_ms(400)
+                bep()      # confirma detección de componente (~100 ms de settling)
                 continue
 
             resistencia = calcular_resistencia(valor_adc)

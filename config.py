@@ -17,7 +17,7 @@ PIN_SDA    = 21   # I2C datos (OLED)
 #  Valores obtenidos con calibrar.py. Cópialos aquí después
 #  de correr ese script con tu circuito.
 R1_BAJO = 1422.1    # Ohms – resistencia de 560Ω
-R1_ALTO = 269689.7   # Ohms – resistencia de 10kΩ
+R1_ALTO = 13200.0   # Ohms – resistencia de 10kΩ
 VIN     = 3.2       # Voltios – tensión de referencia del ADC
 
 # ── Umbrales de auto-ranging ──────────────────────────────────
@@ -33,7 +33,7 @@ VARIANZA_MAX  = 30000  # Varianza alta → señal inestable
 #  Compensa la caída del diodo 1N4007 en el camino del ADC.
 #  Mide un diodo conocido (ej. 1N4007, Vf real ≈ 0.65V a 1mA)
 #  y ajusta este valor hasta que el display coincida.
-VF_OFFSET = 0.25        # Voltios — aumenta si el valor mostrado es muy bajo
+VF_OFFSET = 0.331        # Voltios — aumenta si el valor mostrado es muy bajo
 
 # ── Buzzer y switch de modo ───────────────────────────────────
 PIN_BUZZER = 18   # Buzzer activo: GVS → S=(+), G=(-)

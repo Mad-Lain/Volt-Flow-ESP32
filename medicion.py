@@ -43,7 +43,7 @@ def set_rango(nuevo):
         pin_r_alto.init(machine.Pin.OUT, value=1)
         pin_r_bajo.init(machine.Pin.IN)
     rango_actual = nuevo
-    time.sleep_ms(400)
+    time.sleep_ms(30)
 
 
 def leer_adc(n=50):
