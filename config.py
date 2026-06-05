@@ -7,18 +7,22 @@
 
 # ── Pines ─────────────────────────────────────────────────────
 PIN_ADC    = 34   # Entrada analógica: lee el voltaje del divisor
-PIN_R_BAJO = 25   # Activa R1 del rango bajo  (~1 kΩ)
-PIN_R_ALTO = 26   # Activa R1 del rango alto  (~10 kΩ)
-PIN_BOTON  = 0    # GPIO0 = botón BOOT del ESP32
+PIN_R_BAJO  = 25   # Activa R1 del rango bajo   (~560 Ω)
+PIN_R_ALTO  = 26   # Activa R1 del rango alto   (~10 kΩ)
+PIN_R_EXTRA = 27   # Activa R1 del rango extra  (~47 kΩ)
+PIN_R_SUPER = 33   # Activa R1 del rango super  (~214 kΩ, serie: 100k+47k+47k+20k)
+PIN_BOTON   = 0    # GPIO0 = botón BOOT del ESP32
 PIN_SCL    = 22   # I2C reloj (OLED)
 PIN_SDA    = 21   # I2C datos (OLED)
 
 # ── Calibración ───────────────────────────────────────────────
 #  Valores obtenidos con calibrar.py. Cópialos aquí después
 #  de correr ese script con tu circuito.
-R1_BAJO = 1422.1    # Ohms – resistencia de 560Ω
-R1_ALTO = 13200.0   # Ohms – resistencia de 10kΩ
-VIN     = 3.2       # Voltios – tensión de referencia del ADC
+R1_BAJO  = 723.2     # Ohms – resistencia de 560Ω
+R1_ALTO  = 12042.7    # Ohms – resistencia de 10kΩ
+R1_EXTRA = 56402.8    # Ohms – actualizar con calibrar.py (rango ~47kΩ)
+R1_SUPER = 214000.0   # Ohms – actualizar con calibrar.py (serie 100k+47k+47k+20k)
+VIN      = 3.2        # Voltios – tensión de referencia del ADC
 
 # ── Umbrales de auto-ranging ──────────────────────────────────
 #  El ADC entrega valores de 0 a 4095. Estos umbrales indican
@@ -33,7 +37,7 @@ VARIANZA_MAX  = 30000  # Varianza alta → señal inestable
 #  Compensa la caída del diodo 1N4007 en el camino del ADC.
 #  Mide un diodo conocido (ej. 1N4007, Vf real ≈ 0.65V a 1mA)
 #  y ajusta este valor hasta que el display coincida.
-VF_OFFSET = 0.331        # Voltios — aumenta si el valor mostrado es muy bajo
+VF_OFFSET = 0.164          # Voltios — ajustar si hay diodo en serie en el camino del ADC
 
 # ── Buzzer y switch de modo ───────────────────────────────────
 PIN_BUZZER = 18   # Buzzer activo: GVS → S=(+), G=(-)

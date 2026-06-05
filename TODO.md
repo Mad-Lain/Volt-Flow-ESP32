@@ -41,3 +41,17 @@
 ## App Flutter (VoltFlow)
 
 - [ ] Pendiente de definir
+
+---
+
+## VoltFlow v2 — Mejoras futuras (post-intro)
+
+- [ ] **Modo SERIE — rango extendido con 2 GPIOs**
+  - Usar dos GPIOs libres (ej. GPIO32 y GPIO33) con topología serie:
+    `GPIO_A ──Ra── nodo_medio ──Rb── Nodo A` y `GPIO_B → nodo_medio` (bypass Ra)
+  - GPIO_A=HIGH, GPIO_B=INPUT → Ra+Rb en serie (rango muy alto)
+  - GPIO_B=HIGH, GPIO_A=INPUT → solo Rb (rango normal)
+  - El switch GPIO17 ciclaría: RES → D/L → SERIE
+  - Nueva función `leer_serie()` en `medicion.py`, constantes `R_SERIE_A/B` en `config.py`
+  - Requiere actualizar `calibrar.py` (etapa 4) y animación OLED para el nuevo modo
+  - Diseñado como "VoltFlow v2" — no rompe el flujo intro para estudiantes

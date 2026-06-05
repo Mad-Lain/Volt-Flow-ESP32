@@ -14,8 +14,8 @@
 
 import machine
 import time
-from config import (PIN_ADC, PIN_R_BAJO, PIN_R_ALTO,
-                    R1_BAJO, R1_ALTO, VIN,
+from config import (PIN_ADC, PIN_R_BAJO, PIN_R_ALTO, PIN_R_EXTRA, PIN_R_SUPER,
+                    R1_BAJO, R1_ALTO, R1_EXTRA, R1_SUPER, VIN,
                     BAJAR_RANGO, SUBIR_RANGO,
                     UMBRAL_REPOSO, VARIANZA_MAX,
                     VF_OFFSET)
@@ -26,8 +26,10 @@ adc.atten(machine.ADC.ATTN_11DB)
 adc.width(machine.ADC.WIDTH_12BIT)
 
 # ── Pines de selección de rango ───────────────────────────────
-pin_r_bajo = machine.Pin(PIN_R_BAJO, machine.Pin.IN)
-pin_r_alto = machine.Pin(PIN_R_ALTO, machine.Pin.OUT, value=1)
+pin_r_bajo  = machine.Pin(PIN_R_BAJO,  machine.Pin.IN)
+pin_r_alto  = machine.Pin(PIN_R_ALTO,  machine.Pin.OUT, value=1)
+pin_r_extra = machine.Pin(PIN_R_EXTRA, machine.Pin.IN)
+pin_r_super = machine.Pin(PIN_R_SUPER, machine.Pin.IN)
 
 rango_actual = "ALTO"
 
@@ -39,9 +41,23 @@ def set_rango(nuevo):
     if nuevo == "BAJO":
         pin_r_bajo.init(machine.Pin.OUT, value=1)
         pin_r_alto.init(machine.Pin.IN)
-    else:
+        pin_r_extra.init(machine.Pin.IN)
+        pin_r_super.init(machine.Pin.IN)
+    elif nuevo == "ALTO":
         pin_r_alto.init(machine.Pin.OUT, value=1)
         pin_r_bajo.init(machine.Pin.IN)
+        pin_r_extra.init(machine.Pin.IN)
+        pin_r_super.init(machine.Pin.IN)
+    elif nuevo == "EXTRA":
+        pin_r_extra.init(machine.Pin.OUT, value=1)
+        pin_r_bajo.init(machine.Pin.IN)
+        pin_r_alto.init(machine.Pin.IN)
+        pin_r_super.init(machine.Pin.IN)
+    else:  # SUPER
+        pin_r_super.init(machine.Pin.OUT, value=1)
+        pin_r_bajo.init(machine.Pin.IN)
+        pin_r_alto.init(machine.Pin.IN)
+        pin_r_extra.init(machine.Pin.IN)
     rango_actual = nuevo
     time.sleep_ms(30)
 
@@ -63,13 +79,26 @@ def leer_adc(n=50):
     return mediana, varianza
 
 
-def auto_ranging(valor_adc, varianza):
-    """Cambia de rango si el ADC está fuera de la zona precisa."""
+def auto_ranging(valor_adc, varianza, permitir_extra=False):
+    """Cambia de rango si el ADC está fuera de la zona precisa.
+    permitir_extra solo debe ser True cuando ya hay un componente confirmado."""
     if rango_actual == "ALTO" and valor_adc < BAJAR_RANGO:
         set_rango("BAJO")
         return leer_adc()
     if rango_actual == "BAJO" and valor_adc > SUBIR_RANGO:
         set_rango("ALTO")
+        return leer_adc()
+    if rango_actual == "ALTO" and SUBIR_RANGO < valor_adc < UMBRAL_REPOSO and permitir_extra:
+        set_rango("EXTRA")
+        return leer_adc()
+    if rango_actual == "EXTRA" and valor_adc < BAJAR_RANGO:
+        set_rango("ALTO")
+        return leer_adc()
+    if rango_actual == "EXTRA" and SUBIR_RANGO < valor_adc < UMBRAL_REPOSO and permitir_extra:
+        set_rango("SUPER")
+        return leer_adc()
+    if rango_actual == "SUPER" and valor_adc < BAJAR_RANGO:
+        set_rango("EXTRA")
         return leer_adc()
     return valor_adc, varianza
 
@@ -81,7 +110,14 @@ def calcular_resistencia(valor_adc):
     """
     if valor_adc <= 0:
         return None
-    R1    = R1_BAJO if rango_actual == "BAJO" else R1_ALTO
+    if rango_actual == "BAJO":
+        R1 = R1_BAJO
+    elif rango_actual == "ALTO":
+        R1 = R1_ALTO
+    elif rango_actual == "EXTRA":
+        R1 = R1_EXTRA
+    else:
+        R1 = R1_SUPER
     vout  = (valor_adc / 4095.0) * VIN
     denom = VIN - vout
     if denom <= 0.01:
@@ -101,7 +137,14 @@ def formatear_ohms(r):
 
 def rango_etiqueta():
     """Etiqueta corta del rango activo para mostrar en pantalla."""
-    return "1k" if rango_actual == "BAJO" else "10k"
+    if rango_actual == "BAJO":
+        return "1k"
+    elif rango_actual == "ALTO":
+        return "10k"
+    elif rango_actual == "EXTRA":
+        return "47k"
+    else:
+        return "214k"
 
 
 def leer_vf():

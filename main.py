@@ -62,7 +62,7 @@ while True:
     if modo == "RES":
 
         valor_adc, varianza = leer_adc()
-        valor_adc, varianza = auto_ranging(valor_adc, varianza)
+        valor_adc, varianza = auto_ranging(valor_adc, varianza, not _sin_comp)
 
         if valor_adc > UMBRAL_REPOSO:
             mostrar_reposo(ble_state=ble.state)
